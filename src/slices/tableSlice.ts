@@ -1,72 +1,65 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { type } from "os";
+import { ServiceFee } from "../interfaces/ServiceFee";
 import { RootState } from "../store/store";
+import serviceFeeService from '../service/serviceFee.service'
 
-export type Fees = {
-    id: number,
-    min: number,
-    max: number,
-    fee: number,
-}; 
-
-type tableState = {
-    fees: Fees | null,
-    error: string,
-    loading: boolean,
-}; 
-
-export const fetchFees = createAsyncThunk("fees/getList", async () => {
-    return fetch("http://localhost:8080/fees")
-    .then((res) => res.json())
-    .then(data => console.log(data));
-})
-
-const initialState:tableState = {
-    fees: null,
-    error: "",
-    loading: false,
+interface AsyncState {
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+    
 }
- 
-const tableSlice = createSlice({
-    name: "fees",
+interface ServiceFeeState extends AsyncState {
+    serviceFees: ServiceFee[];
+}; 
+
+const initialState: ServiceFeeState = {
+    serviceFees: [],
+    isLoading: false,
+    isSuccess: false,
+    isError: false,
+}
+
+export const listConfigFee = createAsyncThunk(
+    '/serviceFee/list', async () => {
+        try {
+
+            return await serviceFeeService.listConfigFee();
+
+        } catch (error) {
+            console.log('Error: ', error)
+        }
+    }
+)
+
+export const tableSlice = createSlice({
+    name: 'serviceFee',
     initialState,
-    /*  reducers:{
-           increase:(state: tableState,actions:PayloadAction<number>) =>{
-              
-              state.push({
-                  id: state.length + 1,
-                  min: actions.payload+1,
-                  max:actions.payload+1000,
-                  fee:5.0,
-              });
-                  
-              console.log(state[state.length-1]);
-          },
-          decrease:(state: tableState,actions:PayloadAction<void>) =>{
-              state.pop();
-              console.log(state.length);
-          },
-      }, */
+    reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchFees.pending, (state) => {
-            state.loading = true;
-        });
-        builder.addCase(fetchFees.fulfilled, (state, action) => {
-            state.loading = false;
-            state.error = '';
-        });
-        builder.addCase(fetchFees.rejected, (state) => {
-            state.loading = false;
-            /* state.fees = [] ; */
-            state.error = '';
-        });
-    },
-    reducers: {}
-});
+        builder
+        .addCase(listConfigFee.pending, (state) => {
+            state.isLoading = true
+            console.log(state);
+        })
+        .addCase(listConfigFee.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.serviceFees = action.payload?.data || []
+        })
+        .addCase(listConfigFee.rejected, (state) => {
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.serviceFees = []
+        })
+    }
+})
 
 
 export const { /* increase,decrease */ } = tableSlice.actions;
-export const  tableSelector = (store: RootState) => store.tableReducer;
+export const  tableSelector = (store: RootState) => store.auth;
 export default tableSlice.reducer;
+
 

@@ -14,20 +14,16 @@ import TextField from '@mui/material/TextField';
 import AppleIcon from '@mui/icons-material/Apple';
 import StarIcon from '@mui/icons-material/StarHalfRounded';
 import AdbRoundedIcon from '@mui/icons-material/AdbRounded';
-import { useAppDispatch } from '../store/store';
-import tableSlice, { /* increase,decrease */ Fees, fetchFees } from '../slices/tableSlice';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import tableSlice, { /* increase,decrease */  listConfigFee, tableSelector } from '../slices/tableSlice';
 import { useSelector } from 'react-redux';
 
-type Props {
-}
-
-export default function FeeTable({}: Props) {
-  const fees = useAppSelector((state) => state);
+export default function FeeTable({}) {
   const dispatch = useAppDispatch();
+  const fees = useAppSelector((state) => state.auth.serviceFees);
 
   useEffect(() => {
-    dispatch(fetchFees())
-    console.log(fees);
+    dispatch(listConfigFee());
   },[])
 
 
@@ -65,9 +61,9 @@ export default function FeeTable({}: Props) {
               <TableCell component="th" scope="row">
                 {row.id}
               </TableCell>
-              <TableCell align="right"><TextField variant="standard" type="number" disabled defaultValue={row.min}></TextField></TableCell>
-              <TableCell align="right"><TextField variant="standard" type="number" placeholder='max' defaultValue={row.max} onChange={(e) => setMax(e.target.value)}></TextField></TableCell>
-              <TableCell align="right"><TextField variant="standard" type="number" placeholder='fee' defaultValue={row.fee}></TextField></TableCell>
+              <TableCell align="right"><TextField variant="standard" type="number" disabled defaultValue={row.feePrice}></TextField></TableCell>
+              <TableCell align="right"><TextField variant="standard" type="number" placeholder='min' defaultValue={row.feeMin} onChange={(e) => setMax(e.target.value)}></TextField></TableCell>
+              <TableCell align="right"><TextField variant="standard" type="number" placeholder='max' defaultValue={row.feeMax}></TextField></TableCell>
          
               {fees.length == 1 ? <>
               <TableCell align="right"><Button variant="contained" /* onClick={() => handleCLick(max,row.max)} */>
