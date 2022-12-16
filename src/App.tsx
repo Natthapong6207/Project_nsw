@@ -2,7 +2,7 @@ import React from 'react'
 import { useAppSelector } from './store/store';
 import FeeTable from './app/FeeTable'
 import Appbar from './components/Appbar'
-import { tableSelector } from './slices/tableSlice';
+import { tableSelector } from './slices/serviceFeeSlice';
 import { useSelector } from 'react-redux';
 
 type Props = {}

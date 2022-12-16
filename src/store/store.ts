@@ -1,10 +1,10 @@
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import tableReducer from '../slices/tableSlice';
+import serviceFeeReducer from '../slices/serviceFeeSlice';
 
 export const store = configureStore({
     reducer: {
-        auth: tableReducer
+        fees: serviceFeeReducer
     },
     devTools: process.env.NODE_ENV === "development",
     middleware: (getDefaultMiddleware) => 
