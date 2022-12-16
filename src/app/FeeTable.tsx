@@ -15,52 +15,48 @@ import AppleIcon from '@mui/icons-material/Apple';
 import StarIcon from '@mui/icons-material/StarHalfRounded';
 import AdbRoundedIcon from '@mui/icons-material/AdbRounded';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import tableSlice, { increase,decrease ,  createConfigFee, listConfigFee, tableSelector } from '../slices/serviceFeeSlice';
+import tableSlice, { increase,decrease ,  createConfigFee, listConfigFee, tableSelector, deleteConfigFee } from '../slices/serviceFeeSlice';
 import { useSelector } from 'react-redux';
 import { ServiceFee } from '../interfaces/ServiceFee';
 import serviceFeeService from '../service/serviceFee.service';
 
 export default function FeeTable({}) {
   const dispatch = useAppDispatch();
-  var fees = useAppSelector((state) => state.fees.serviceFees);
+  const fees = useAppSelector((state) => state.fees.serviceFees);
+
+  const [data,setData] = useState<ServiceFee[]>([]);
 
   useEffect(() => {
     dispatch(listConfigFee());
+    setData(JSON.parse(JSON.stringify(fees)))
+    console.log("DATA: "+data.length)
   },[])
 
-  const [data,setData] = useState<ServiceFee>({
-    id: 1,
-    feePrice: 0,
-    feeMin: 0,
-    feeMax: 0,
-  });
-
+  const [price,setPrice] = useState("");
   const [min,setMin] = useState("");
   const [max,setMax] = useState("");
-  
-  const handleFirstRow = (min: any, max: any) => {
-    setData({ id: 2,
-      feePrice: 4.5,
-      feeMin: min,
-      feeMax: max })
-    console.log("data: "+data.id +" "+ data.feePrice +" "+ data.feeMin +" "+ data.feeMax)
-    fees.push(data)
-    console.log("fees: "+fees.toString)
-    
-  }
 
-  const handleCLick = (newFee: ServiceFee) => {
-    setData(newFee)
-    fees.push(data)
-    console.log("newFee: "+newFee.toString)
-    console.log("fees: "+fees.toString)
+  const handleClickAdd = () => {
+    data.push({
+      id: fees.length,
+      feePrice: parseFloat(price),
+      feeMin: parseFloat(min),
+      feeMax: parseFloat(max)
+    })
+    console.log("fees: "+data.toString)
+  } 
+
+  const handleClickRemove = () => {
+    data.pop()
+    console.log("data pop: "+data.values)
+    setData(data)
   } 
   
   return (
     <div>
         <Container>
       <AppleIcon/>
-      <AdbRoundedIcon/>
+      <AdbRoundedIcon/>s
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead> 
@@ -83,20 +79,20 @@ export default function FeeTable({}) {
               <TableCell component="th" scope="row">
                 {row.id}
               </TableCell>
-              <TableCell align="right"><TextField variant="standard" type="number" disabled defaultValue={row.feePrice}></TextField></TableCell>
+              <TableCell align="right"><TextField variant="standard" type="number" placeholder='price' defaultValue={row.feePrice} onChange={(e) => setPrice(e.target.value)}></TextField></TableCell>
               <TableCell align="right"><TextField variant="standard" type="number" placeholder='min' defaultValue={row.feeMin} onChange={(e) => setMin(e.target.value)}></TextField></TableCell>
               <TableCell align="right"><TextField variant="standard" type="number" placeholder='max' defaultValue={row.feeMax} onChange={(e) => setMax(e.target.value)}></TextField></TableCell>
          
               {fees.length == 1 ? <>
-              <TableCell align="right"><Button variant="contained" onClick={() => dispatch(increase())}>
+              <TableCell align="right"><Button variant="contained" onClick={() => {handleClickAdd(); dispatch(increase(row))}}>
                 <AddIcon/></Button><Button hidden><RemoveIcon/></Button></TableCell>
               </>
               :
               row.id ==  fees.length ?  <>
 
-              <TableCell align="right"><Button variant="contained" onClick={() => dispatch(increase())}>
+              <TableCell align="right"><Button variant="contained" onClick={() => {handleClickAdd(); dispatch(increase(row))}}>
                 <AddIcon /></Button>
-                <Button variant="contained" onClick={ () => dispatch(decrease())}><RemoveIcon/></Button></TableCell>
+                <Button variant="contained" onClick={() => {handleClickRemove(); dispatch(decrease())}}><RemoveIcon/></Button></TableCell>
                 </>
                 : 
                 <>
@@ -109,7 +105,8 @@ export default function FeeTable({}) {
           ))}
         </TableBody>
       </Table>
-      <Button onClick={() => dispatch(createConfigFee(fees))}><AddIcon/></Button>
+      <Button onClick={() => {dispatch(deleteConfigFee()); dispatch(createConfigFee(data))}}>SAVE</Button>
+      <Button onClick={() => dispatch(deleteConfigFee())}>DELETE</Button>
     </TableContainer>
     </Container>
     </div>

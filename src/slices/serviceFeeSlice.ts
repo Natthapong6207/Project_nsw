@@ -44,7 +44,7 @@ export const createConfigFee = createAsyncThunk(
 )
 
 export const deleteConfigFee = createAsyncThunk(
-    'serviceFee',
+    '/serviceFee',
     async () => {
         try {
             return await serviceFeeService.deleteConfigFee();
@@ -58,12 +58,12 @@ export const serviceFeeSlice = createSlice({
     name: 'serviceFee',
     initialState,
     reducers: {
-        increase:(state: ServiceFeeState) =>{
+        increase:(state: ServiceFeeState,actions:PayloadAction<ServiceFee>) =>{
             state.serviceFees.push({
                 id: state.serviceFees.length + 1,
-                feePrice: 0,
-                feeMin: 0,
-                feeMax: 0,
+                feePrice: actions.payload.feePrice,
+                feeMin: actions.payload.feeMin,
+                feeMax: actions.payload.feeMax,
             });
         },
         decrease:(state: ServiceFeeState) =>{
